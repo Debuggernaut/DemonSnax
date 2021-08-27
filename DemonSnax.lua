@@ -21,6 +21,7 @@ DemonSnaxData = {}
 DemonSnaxData.vfActive = false;
 DemonSnaxData.vfExpires = 0;
 DemonSnaxData.uiUpdateDelay = 1.0/60.0;
+DemonSnaxData.nextUpdate = 0;
 
 
 local DemonSnaxFrame = CreateFrame("FRAME", "DemonSnaxFrame")
@@ -90,6 +91,70 @@ function SlashCmdList.DEMONSNAX(msg, editbox) -- 4.
  dcPrint("test");
 end
 
+function updateUI(timestamp)
+    if timestamp > DemonSnaxData.nextUpdate then
+        local dbg = false
+        DemonSnaxData.nextUpdate = timestamp + DemonSnaxData.uiUpdateDelay
+        if (DemonSnaxData.vfExpires == 0) then
+            DemonSnaxData.vfExpires = timestamp + 15
+            dbg = true
+        end
+
+        if (timestamp > DemonSnaxData.vfExpires + 5) then
+            DemonSnaxData.vfExpires = 0
+        end
+
+        local handCastTime = 0
+        local name, rank, icon, tyrantCastTime, minRange, maxRange = GetSpellInfo("Summon Demonic Tyrant")
+        name, rank, icon, handCastTime, minRange, maxRange = GetSpellInfo("Hand of Gul'dan")
+        tyrantCastTime = tyrantCastTime / 1000.0
+        handCastTime = handCastTime / 1000.0
+        local shadowBoltTime = tyrantCastTime
+        local demonBoltTime = handCastTime
+        local dogTime = demonBoltTime
+
+        VilefiendTime:SetText(string.format("%.1f seconds", DemonSnaxData.vfExpires - timestamp))
+        SBTime:SetText(string.format("%.1f seconds", tyrantCastTime))
+        HandTime:SetText(string.format("%.1f seconds", handCastTime))
+
+        if dbg then
+            local bigHands = 2
+            local setupTime = 15 --15 seconds after you cast Vilefiend to get out 1x bolt,
+                -- 1x dogs, 1x hand w/ 3 shards, 1x bolt, 1x hand with 3 shards, (filler)
+                -- then Summon Demonic Tyrant (+200ms leeway)
+            local fillerTime = setupTime - tyrantCastTime - dogTime - 2*shadowBoltTime - 2*handCastTime - 0.2
+            local bigHandTime = 3 * shadowBoltTime + handCastTime
+            bigHands = bigHands + math.floor(fillerTime/bigHandTime)
+            local remaining = fillerTime % bigHandTime
+            remaining = remaining - shadowBoltTime - handCastTime
+            local smallHand = 0
+            if (remaining > 0) then
+                local extraBolts = math.floor(remaining/shadowBoltTime)
+                smallHand = 1 + extraBolts
+            end
+            print("filler:", fillerTime, " bht:", bigHandTime, " rem:", remaining, ", bHs:", bigHands)
+
+            local imps = bigHands*3 + smallHand
+            local hands = bigHands
+            if (smallHand > 0) then
+                hands = hands + 1
+            end
+    
+            local bolts = imps
+            if smallHand == 0 and remaining > shadowBoltTime then
+                bolts = bolts + 1
+            end
+    
+            MaxImpsNoCores:SetText(string.format("%d", imps))
+            XBoltsYHands200:SetText(string.format("Time for %d bolts and %d hands (200ms margin)", bolts, hands))
+    
+            --doh, looks like you need to do 2x shadowbolt after the vilefiend, and if you get demonic calling you need to add
+            -- a filler spell after that if you want your dogs to get hit with the tyrant when he comes out
+            -- 
+        end
+    end
+end
+
 function handleEvent(...)
     local playerGUID = UnitGUID("player")
     local MSG_CRITICAL_HIT = "Your %s hit %s for %d damage!"
@@ -127,6 +192,8 @@ function handleEvent(...)
         --print(MSG_CRITICAL_HIT:format(action, destName, amount))
         end
     end
+
+    updateUI(timestamp)
 end
 
 

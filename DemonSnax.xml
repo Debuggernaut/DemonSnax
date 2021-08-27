@@ -28,10 +28,10 @@
 				</FontString>
                 <FontString inherits="GameFontNormalLarge" name="VilefiendLabel" text="Vilefiend:" >
                     <Color r="1" g="0.8" b="1" a="1"/>
-                    <FontHeight val="16"/>
+                    <FontHeight val="12"/>
                     <Anchors>
                         <Anchor point="TOPLEFT">
-                            <Offset x="12" y="-32"/>
+                            <Offset x="16" y="-32"/>
                         </Anchor>
                     </Anchors>
                 </FontString>

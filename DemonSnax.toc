@@ -1,6 +1,6 @@
 ## Interface: 91500
 ## Title: DemonSnax
-## Author: Bernycinders-Thrall
+## Author: Debuggernaut
 ## Version: 0.1
 
 DemonSnax.lua
