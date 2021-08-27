@@ -1,124 +1,137 @@
 <Ui>
-    <Frame name="DemonSnax_Frame" parent="UIParent"
-    inherits="SimplePanelTemplate" clampedToScreen="true" enableMouse="true" movable="true" toplevel="true" hidden="false">
+    <Frame name="DemonSnax_Frame" parent="UIParent" inherits="TooltipBorderedFrameTemplate"
+     clampedToScreen="true" enableMouse="true" movable="true" toplevel="true" hidden="false">
         <Scripts>
             <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
             <OnDragStart>self:StartMoving();</OnDragStart>
             <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
         </Scripts>
+    <KeyValues>
+        <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_16_16_5555" type="global"/>
+        <KeyValue key="backdropBorderColor" value="LEGENDARY_ORANGE_COLOR" type="global"/>
+        <KeyValue key="backdropBorderColorAlpha" value="0.25" type="number"/>
+    </KeyValues>
   	    <Size>
-			<AbsDimension x="400" y="500"/>
+			<AbsDimension x="400" y="160"/>
 		</Size>
 
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
         <Layers>
-			<Layer level="ARTWORK">
+			<Layer>
 				<!-- TODO: Cool UI -->
-				<FontString parentKey="pageNumber" inherits="GameFontHighlightSmall" text="DemonSnax">
+				<FontString inherits="GameFontHighlightSmall" text="DemonSnax">
 					<Anchors>
-						<Anchor point="CENTER" relativePoint="TOPLEFT" x="145" y="-16"/>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="32" y="-8"/>
 					</Anchors>
 				</FontString>
-			</Layer>
+                <FontString inherits="GameFontNormalLarge" name="VilefiendLabel" text="Vilefiend:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="12" y="-32"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="VilefiendTime" text="13.2 seconds" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="96" y="-32"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" text="Tyrant/Shadowbolt:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="16" y="-48"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="SBTime" text="1.9 seconds" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="170" y="-48"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" text="Hand/Instant GCD:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="16" y="-64"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="HandTime" text="1.4 seconds" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="170" y="-64"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" text="Max Imps No Cores:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="16" y="-80"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="MaxImpsNoCores" text="9" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="176" y="-80"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="MaxImpsXCoresLabel" text="Max Imps X Cores:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="16" y="-96"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="MaxImpsXCoresVal" text="11" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="176" y="-96"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="XBoltsYHands200" text="Time for X bolts and Y hands (200ms margin)" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="16" y="-112"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="XBoltsYHands600" text="Time for X bolts and Y hands (600ms)" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="16" y="-128"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
 		</Layers>
 		<Frames>
-            <Button inherits="UIPanelButtonTemplate" text="Clear Log">
-                <Size x="140" y="30"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT">
-                        <Offset x="12" y="-32"/>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnClick> DemonSnaxEditBox:SetText("") </OnClick>
-                </Scripts>
-            </Button>
-            <FontString name="VilefiendLabel" font="Fonts\FRIZQT__.TTF" text="Vilefiend:" justifyH="LEFT" justifyV="TOP">
-                <Color r="1" g="0.8" b="1" a="1"/>
-                <FontHeight val="12"/>
-                <Anchors>
-                <Anchor point="TOPLEFT" relativeTo="$parent" x="12" y="-62" />
-                </Anchors>
-                <Shadow>
-                    <Offset x="1" y="1" />
-                    <Color r="0" g="0" b="0"/>
-                </Shadow>
-            </FontString>
-            <FontString name="VilefiendTime" font="Fonts\FRIZQT__.TTF" text="13.2 seconds" justifyH="LEFT" justifyV="TOP">
-                <Color r="1" g="0.8" b="1" a="1"/>
-                <FontHeight val="12"/>
-                <Anchors>
-                <Anchor point="TOPLEFT" relativeTo="VilefiendLabel" x="20" y="0" />
-                </Anchors>
-                <Shadow>
-                    <Offset x="1" y="1" />
-                    <Color r="0" g="0" b="0"/>
-                </Shadow>
-            </FontString>
-
-            <!-- 
-            <Button inherits="UIPanelButtonTemplate" text="List Glyphs to Craft">
-                <Size x="140" y="30"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT">
-                        <Offset x="158" y="-32"/>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnClick> coolFrame:checkProf(); </OnClick>
-                </Scripts>
-            </Button>
-            <Button inherits="UIPanelButtonTemplate" text="Start Craftin'">
-                <Size x="140" y="30"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT">
-                        <Offset x="12" y="-62"/>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnClick> coolFrame:craftEm(); </OnClick>
-                </Scripts>
-            </Button>
-            <Button inherits="UIPanelButtonTemplate" text="Post Auctions">
-                <Size x="140" y="30"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT">
-                        <Offset x="158" y="-62"/>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnClick> coolFrame:postAuctions(); </OnClick>
-                </Scripts>
-            </Button>
-            <Button inherits="UIPanelButtonTemplate" text="Deals">
-                <Size x="80" y="30"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT">
-                        <Offset x="304" y="-32"/>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnClick> coolFrame:dealHunt(); </OnClick>
-                </Scripts>
-            </Button>
-            <Button inherits="UIPanelButtonTemplate" text="Data Dump">
-                <Size x="160" y="30"/>
-                <Anchors>
-                    <Anchor point="TOPLEFT">
-                        <Offset x="12" y="-92"/>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnClick> coolFrame:dataDump(); </OnClick>
-                </Scripts>
-            </Button> -->
-            
+<!--         
             <ScrollFrame name="DemonSnax_ScrollFrame" inherits="UIPanelScrollFrameTemplate">
                 <Anchors>
                     <Anchor point="TOPLEFT">
-                        <Offset x="12" y="-132"/>
+                        <Offset x="12" y="-148"/>
                     </Anchor>
                     <Anchor point="BOTTOMRIGHT">
                         <Offset x="-28" y="40"/>
@@ -126,7 +139,6 @@
                 </Anchors>
                 <Layers>
                     <Layer level="BORDER">
-                        <!-- gradient for scrollbar track -->
                         <Texture file="Interface\ChatFrame\ChatFrameBackground">
                             <Anchors>
                                 <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
@@ -144,7 +156,6 @@
                     </Layer>
                 </Layers>
                 <ScrollChild>
-                    <!-- the main editbox where the magic happens -->
                     <EditBox parentKey="editBox" name="DemonSnaxEditBox" multiLine="true" nonspacewrap="true" spacing="1" autoFocus="false" ignoreParentAlpha="true">
                         <Size x="360" y="250"/>
                         <Anchors>
@@ -158,10 +169,27 @@
                 </ScrollChild>
             </ScrollFrame>
             
-            <Button name="$parentButtonClose" inherits="OptionsButtonTemplate" text="Close">
+            <Button inherits="OptionsButtonTemplate" text="Clear Log">
+                <Size x="96" y="24"/>
                 <Anchors>
                     <Anchor point="BOTTOMRIGHT">
-                    <Offset x="-12" y="6"/>
+                    <Offset x="-80" y="10"/>
+                    </Anchor> 
+                </Anchors>
+                <Scripts>
+                    <OnClick> DemonSnaxEditBox:SetText("") </OnClick>
+                </Scripts>
+                <Shadow>
+                    <Offset x="1" y="1" />
+                    <Color r="0" g="0" b="0"/>
+                </Shadow>
+            </Button> 
+            -->
+            <Button name="$parentButtonClose" inherits="OptionsButtonTemplate" text="Close">
+                <Size x="48" y="24"/>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT">
+                    <Offset x="-12" y="10"/>
                     </Anchor> 
                 </Anchors>
                 <Scripts>
