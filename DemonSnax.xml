@@ -12,7 +12,7 @@
         <KeyValue key="backdropBorderColorAlpha" value="0.25" type="number"/>
     </KeyValues>
   	    <Size>
-			<AbsDimension x="400" y="160"/>
+			<AbsDimension x="400" y="170"/>
 		</Size>
 
 		<Anchors>
@@ -28,7 +28,7 @@
 				</FontString>
                 <FontString inherits="GameFontNormalLarge" name="VilefiendLabel" text="Vilefiend:" >
                     <Color r="1" g="0.8" b="1" a="1"/>
-                    <FontHeight val="12"/>
+                    <FontHeight val="16"/>
                     <Anchors>
                         <Anchor point="TOPLEFT">
                             <Offset x="12" y="-32"/>

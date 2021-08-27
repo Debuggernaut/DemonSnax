@@ -33,8 +33,9 @@ DemonSnaxFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 DemonSnaxFrame:SetScript("OnEvent", OnEvent)
 
 local function dcPrint(msg)
-    local t = DemonSnaxEditBox:GetText() or ""
-    DemonSnaxEditBox:SetText(t .. "\n" .. msg);
+    --local t = DemonSnaxEditBox:GetText() or ""
+    --DemonSnaxEditBox:SetText(t .. "\n" .. msg);
+    print(msg)
 end
 
 local function LogEvent(self, event, ...)
