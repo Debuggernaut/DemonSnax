@@ -1,0 +1,173 @@
+<Ui>
+    <Frame name="DemonSnax_Frame" parent="UIParent"
+    inherits="SimplePanelTemplate" clampedToScreen="true" enableMouse="true" movable="true" toplevel="true" hidden="false">
+        <Scripts>
+            <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
+            <OnDragStart>self:StartMoving();</OnDragStart>
+            <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+        </Scripts>
+  	    <Size>
+			<AbsDimension x="400" y="500"/>
+		</Size>
+
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+        <Layers>
+			<Layer level="ARTWORK">
+				<!-- TODO: Cool UI -->
+				<FontString parentKey="pageNumber" inherits="GameFontHighlightSmall" text="DemonSnax">
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOPLEFT" x="145" y="-16"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+            <Button inherits="UIPanelButtonTemplate" text="Clear Log">
+                <Size x="140" y="30"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="12" y="-32"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick> DemonSnaxEditBox:SetText("") </OnClick>
+                </Scripts>
+            </Button>
+            <FontString name="VilefiendLabel" font="Fonts\FRIZQT__.TTF" text="Vilefiend:" justifyH="LEFT" justifyV="TOP">
+                <Color r="1" g="0.8" b="1" a="1"/>
+                <FontHeight val="12"/>
+                <Anchors>
+                <Anchor point="TOPLEFT" relativeTo="$parent" x="12" y="-62" />
+                </Anchors>
+                <Shadow>
+                    <Offset x="1" y="1" />
+                    <Color r="0" g="0" b="0"/>
+                </Shadow>
+            </FontString>
+            <FontString name="VilefiendTime" font="Fonts\FRIZQT__.TTF" text="13.2 seconds" justifyH="LEFT" justifyV="TOP">
+                <Color r="1" g="0.8" b="1" a="1"/>
+                <FontHeight val="12"/>
+                <Anchors>
+                <Anchor point="TOPLEFT" relativeTo="VilefiendLabel" x="20" y="0" />
+                </Anchors>
+                <Shadow>
+                    <Offset x="1" y="1" />
+                    <Color r="0" g="0" b="0"/>
+                </Shadow>
+            </FontString>
+
+            <!-- 
+            <Button inherits="UIPanelButtonTemplate" text="List Glyphs to Craft">
+                <Size x="140" y="30"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="158" y="-32"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick> coolFrame:checkProf(); </OnClick>
+                </Scripts>
+            </Button>
+            <Button inherits="UIPanelButtonTemplate" text="Start Craftin'">
+                <Size x="140" y="30"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="12" y="-62"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick> coolFrame:craftEm(); </OnClick>
+                </Scripts>
+            </Button>
+            <Button inherits="UIPanelButtonTemplate" text="Post Auctions">
+                <Size x="140" y="30"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="158" y="-62"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick> coolFrame:postAuctions(); </OnClick>
+                </Scripts>
+            </Button>
+            <Button inherits="UIPanelButtonTemplate" text="Deals">
+                <Size x="80" y="30"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="304" y="-32"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick> coolFrame:dealHunt(); </OnClick>
+                </Scripts>
+            </Button>
+            <Button inherits="UIPanelButtonTemplate" text="Data Dump">
+                <Size x="160" y="30"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="12" y="-92"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick> coolFrame:dataDump(); </OnClick>
+                </Scripts>
+            </Button> -->
+            
+            <ScrollFrame name="DemonSnax_ScrollFrame" inherits="UIPanelScrollFrameTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset x="12" y="-132"/>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset x="-28" y="40"/>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="BORDER">
+                        <!-- gradient for scrollbar track -->
+                        <Texture file="Interface\ChatFrame\ChatFrameBackground">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+                                    <Offset x="0" y="0"/>
+                                </Anchor>
+                                <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+                                    <Offset x="23" y="0"/>
+                                </Anchor>
+                            </Anchors>
+                            <Gradient>
+                                <MinColor r="0.1" g="0.1" b="0.1"/>
+                                <MaxColor r="0" g="0" b="0"/>
+                            </Gradient>
+                        </Texture>
+                    </Layer>
+                </Layers>
+                <ScrollChild>
+                    <!-- the main editbox where the magic happens -->
+                    <EditBox parentKey="editBox" name="DemonSnaxEditBox" multiLine="true" nonspacewrap="true" spacing="1" autoFocus="false" ignoreParentAlpha="true">
+                        <Size x="360" y="250"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                            <Anchor point="BOTTOMRIGHT"/>
+                        </Anchors>
+                        <Scripts>
+                        </Scripts>
+                        <FontString inherits="GameFontHighlight"/>
+                    </EditBox>
+                </ScrollChild>
+            </ScrollFrame>
+            
+            <Button name="$parentButtonClose" inherits="OptionsButtonTemplate" text="Close">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT">
+                    <Offset x="-12" y="6"/>
+                    </Anchor> 
+                </Anchors>
+                <Scripts>
+                    <OnClick> self:GetParent():Hide(); </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+</Ui>

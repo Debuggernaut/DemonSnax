@@ -1,0 +1,7 @@
+## Interface: 91500
+## Title: DemonSnax
+## Author: Bernycinders-Thrall
+## Version: 0.1
+
+DemonSnax.lua
+DemonSnax.xml
