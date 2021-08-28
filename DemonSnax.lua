@@ -100,6 +100,74 @@ function SlashCmdList.DEMONSNAX(msg, editbox)
     end
 end
 
+--To use these functions with TellMeWhen, copy in this line of code without the "--" at the front
+-- if DemonSnax_TyrantAlert ~= nil then return DemonSnax_TyrantAlert(); else return false; end
+
+-- if DemonSnax_LastHandAlert ~= nil then return DemonSnax_LastHandAlert(); else return false; end
+
+function DemonSnax_TyrantAlert()
+    return DemonSnax_Alert(2)
+end
+
+function DemonSnax_LastHandAlert()
+    return DemonSnax_Alert(1)
+end
+
+function DemonSnax_Alert(which)
+    if DemonSnaxData == nil then
+        return false
+    end
+    local vfTimeLeft = DemonSnaxData.vfExpires - GetTime()
+
+    if (vfTimeLeft < 0) then
+        DemonSnaxData.vfExpires = 0
+        vfTimeLeft = 0
+    end
+
+    local handCastTime = 0
+    local name, rank, icon, tyrantCastTime, minRange, maxRange = GetSpellInfo("Summon Demonic Tyrant")
+    name, rank, icon, handCastTime, minRange, maxRange = GetSpellInfo("Hand of Gul'dan")
+    tyrantCastTime = tyrantCastTime / 1000.0
+    handCastTime = handCastTime / 1000.0
+    local shadowBoltTime = tyrantCastTime
+    local demonBoltTime = handCastTime
+    local dogTime = demonBoltTime
+
+    local spell, _, _, _, endTimeMs = UnitCastingInfo("player")
+    local gcdStart, duration, _, _ = GetSpellCooldown(61304)
+    local timeAfterCur = vfTimeLeft
+    if (endTimeMs ~= nil and vfTimeLeft ~= 0) then
+        local endTime = endTimeMs / 1000
+        timeAfterCur = DemonSnaxData.vfExpires - endTime
+    elseif (gcdStart ~= 0 and vfTimeLeft ~= 0) then
+        local endTime = gcdStart + duration
+        timeAfterCur = DemonSnaxData.vfExpires - endTime
+    end
+
+    local deadline = 0.2 + tyrantCastTime
+    local tyrantDeadline = deadline
+    deadline = deadline + handCastTime
+    local handDeadline = deadline
+    deadline = deadline + shadowBoltTime
+    
+    if (tyrantDeadline < timeAfterCur and handDeadline > timeAfterCur) then
+        if (which == 2) then            
+            return true
+        else 
+            return false
+        end
+    elseif (handDeadline + demonBoltTime > timeAfterCur and handDeadline < timeAfterCur) then
+        if (which == 1) then            
+            return true
+        else 
+            return false
+        end
+    else
+        return false
+    end
+--end
+end
+
 function DemonSnax_updateUI(self, elapsed)
     --if timestamp > DemonSnaxData.nextUpdate then
         local dbg = false
