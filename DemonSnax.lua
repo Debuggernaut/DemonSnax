@@ -104,10 +104,10 @@ function DemonSnax_updateUI(self, elapsed)
     --if timestamp > DemonSnaxData.nextUpdate then
         local dbg = false
         --DemonSnaxData.nextUpdate = timestamp + DemonSnaxData.uiUpdateDelay
-        if (DemonSnaxData.vfExpires == 0) then
-            DemonSnaxData.vfExpires = GetTime() + 15
-            dbg = true
-        end
+        -- if (DemonSnaxData.vfExpires == 0) then
+        --     DemonSnaxData.vfExpires = GetTime() + 15
+        --     dbg = true
+        -- end
 
         local vfTimeLeft = DemonSnaxData.vfExpires - GetTime()
 
@@ -126,25 +126,35 @@ function DemonSnax_updateUI(self, elapsed)
         local dogTime = demonBoltTime
 
         local spell, _, _, _, endTimeMs = UnitCastingInfo("player")
+        local gcdStart, duration, _, _ = GetSpellCooldown(61304)
         local timeAfterCur = vfTimeLeft
-        if (endTimeMs ~= nil) then
+        if (endTimeMs ~= nil and vfTimeLeft ~= 0) then
             local endTime = endTimeMs / 1000
+            timeAfterCur = DemonSnaxData.vfExpires - endTime
+        elseif (gcdStart ~= 0 and vfTimeLeft ~= 0) then
+            local endTime = gcdStart + duration
             timeAfterCur = DemonSnaxData.vfExpires - endTime
         end
         --TODO: GCD
-
-        TimeLeftAfterCurCast:SetText(string.format("%.1f seconds", timeAfterCur))
 
         VilefiendTime:SetText(string.format("%.1f seconds", vfTimeLeft))
         SBTime:SetText(string.format("%.1f seconds", tyrantCastTime))
         HandTime:SetText(string.format("%.1f seconds", handCastTime))
 
         local deadline = 0.2 + tyrantCastTime
-        Deadline_Tyrant:SetText(string.format("%.1f seconds", deadline))
+        local tyrantDeadline = deadline
+        Deadline_Tyrant:SetText(string.format("%.1f seconds", tyrantDeadline))
         deadline = deadline + handCastTime
+        local handDeadline = deadline
         Deadline_LastHand:SetText(string.format("%.1f seconds", deadline))
         deadline = deadline + shadowBoltTime
         Deadline_LastSBolt:SetText(string.format("%.1f seconds", deadline))
+        
+        if (tyrantDeadline < timeAfterCur and handDeadline > timeAfterCur) then
+            TimeLeftAfterCurCast:SetText(string.format("** %.1f seconds **", timeAfterCur))
+        else
+            TimeLeftAfterCurCast:SetText(string.format("%.1f seconds", timeAfterCur))
+        end
     --end
 end
 
@@ -163,7 +173,7 @@ function handleEvent(...)
     elseif subevent == "SPELL_MISSED" then
         spellId, spellName, spellSchool, missType, isOffHand, amount, critical = select(12, ...)
 
-    elseif subevent == "SPELL_CAST_SUCCESS" then
+    elseif sourceGUID == playerGUID and subevent == "SPELL_CAST_SUCCESS" then
         spellId, spellName, spellSchool = select(12, ...)
         if spellId == 265187 then
             print("Demonic Tyrant summoned!")
@@ -171,6 +181,17 @@ function handleEvent(...)
             DemonSnaxData.tyrants[#DemonSnaxData.tyrants].timestamp = timestamp
             DemonSnaxData.tyrants[#DemonSnaxData.tyrants].total = 0
         end
+    elseif sourceGUID == playerGUID and subevent == "SPELL_SUMMON" then
+        spellId, spellName, spellSchool = select(12, ...)
+        if spellId == 264119 then
+            DemonSnaxData.vfActive = true
+            DemonSnaxData.vfExpires = GetTime() + 15
+        end
+        print("Summon!", spellName, spellId)
+        --    DemonSnaxData.tyrants[#DemonSnaxData.tyrants+1] = {}
+        --    DemonSnaxData.tyrants[#DemonSnaxData.tyrants].timestamp = timestamp
+        --    DemonSnaxData.tyrants[#DemonSnaxData.tyrants].total = 0
+        --end
     end
 
 --Player-3678-09B406BD
@@ -182,7 +203,7 @@ function handleEvent(...)
             print(cooldump({...}))
             local cur = #DemonSnaxData.tyrants
             print("cur: ", cur, ", amount:", amount)
-            print("DemonSnax dealt ", DemonSnaxData.tyrants[cur].total, " damage")
+            print("Demonic Consumption dealt ", DemonSnaxData.tyrants[cur].total, " damage")
             DemonSnaxData.tyrants[cur].total = DemonSnaxData.tyrants[cur].total + amount
         -- get the link of the spell or the MELEE globalstring
         --local action = spellId and GetSpellLink(spellId) or MELEE
