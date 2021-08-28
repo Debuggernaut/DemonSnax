@@ -1,10 +1,11 @@
 <Ui>
     <Frame name="DemonSnax_Frame" parent="UIParent" inherits="TooltipBorderedFrameTemplate"
-     clampedToScreen="true" enableMouse="true" movable="true" toplevel="true" hidden="false">
+     clampedToScreen="true" enableMouse="true" movable="true" toplevel="true" hidden="true">
         <Scripts>
             <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
             <OnDragStart>self:StartMoving();</OnDragStart>
             <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+            <OnUpdate function="DemonSnax_updateUI" />
         </Scripts>
     <KeyValues>
         <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_16_16_5555" type="global"/>
@@ -12,7 +13,7 @@
         <KeyValue key="backdropBorderColorAlpha" value="0.25" type="number"/>
     </KeyValues>
   	    <Size>
-			<AbsDimension x="400" y="170"/>
+			<AbsDimension x="400" y="190"/>
 		</Size>
 
 		<Anchors>
@@ -30,15 +31,15 @@
                     <Color r="1" g="0.8" b="1" a="1"/>
                     <FontHeight val="12"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT">
-                            <Offset x="16" y="-32"/>
+                        <Anchor relativePoint="TOPLEFT" point="TOPRIGHT">
+                            <Offset x="176" y="-32"/>
                         </Anchor>
                     </Anchors>
                 </FontString>
                 <FontString inherits="GameFontNormalLarge" name="VilefiendTime" text="13.2 seconds" >
                     <Anchors>
                         <Anchor point="TOPLEFT">
-                            <Offset x="96" y="-32"/>
+                            <Offset x="184" y="-32"/>
                         </Anchor>
                     </Anchors>
                 </FontString>
@@ -46,15 +47,15 @@
                     <Color r="1" g="0.8" b="1" a="1"/>
                     <FontHeight val="12"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT">
-                            <Offset x="16" y="-48"/>
+                        <Anchor relativePoint="TOPLEFT" point="TOPRIGHT">
+                            <Offset x="176" y="-48"/>
                         </Anchor>
                     </Anchors>
                 </FontString>
                 <FontString inherits="GameFontNormalLarge" name="SBTime" text="1.9 seconds" >
                     <Anchors>
                         <Anchor point="TOPLEFT">
-                            <Offset x="170" y="-48"/>
+                            <Offset x="184" y="-48"/>
                         </Anchor>
                     </Anchors>
                 </FontString>
@@ -62,19 +63,19 @@
                     <Color r="1" g="0.8" b="1" a="1"/>
                     <FontHeight val="12"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT">
-                            <Offset x="16" y="-64"/>
+                        <Anchor relativePoint="TOPLEFT" point="TOPRIGHT">
+                            <Offset x="176" y="-64"/>
                         </Anchor>
                     </Anchors>
                 </FontString>
                 <FontString inherits="GameFontNormalLarge" name="HandTime" text="1.4 seconds" >
                     <Anchors>
                         <Anchor point="TOPLEFT">
-                            <Offset x="170" y="-64"/>
+                            <Offset x="184" y="-64"/>
                         </Anchor>
                     </Anchors>
                 </FontString>
-                <FontString inherits="GameFontNormalLarge" text="Max Imps No Cores:" >
+                <FontString inherits="GameFontNormalLarge" text="Tyrant setup deadlines: (200ms leeway)" >
                     <Color r="1" g="0.8" b="1" a="1"/>
                     <FontHeight val="12"/>
                     <Anchors>
@@ -83,13 +84,71 @@
                         </Anchor>
                     </Anchors>
                 </FontString>
-                <FontString inherits="GameFontNormalLarge" name="MaxImpsNoCores" text="9" >
+                <FontString inherits="GameFontNormalLarge" text="Time after current cast:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT">
-                            <Offset x="176" y="-80"/>
+                        <Anchor relativePoint="TOPLEFT" point="TOPRIGHT">
+                            <Offset x="232" y="-96"/>
                         </Anchor>
                     </Anchors>
                 </FontString>
+                <FontString inherits="GameFontNormalLarge" name="TimeLeftAfterCurCast" text="9" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="248" y="-96"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" text="Last Shadowbolt:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor relativePoint="TOPLEFT" point="TOPRIGHT">
+                            <Offset x="232" y="-114"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="Deadline_LastSBolt" text="9" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="248" y="-114"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" text="Last Hand of Gul'dan:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor relativePoint="TOPLEFT" point="TOPRIGHT">
+                            <Offset x="232" y="-130"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="Deadline_LastHand" text="9" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="248" y="-130"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" text="Summon Demonic Tyrant:" >
+                    <Color r="1" g="0.8" b="1" a="1"/>
+                    <FontHeight val="12"/>
+                    <Anchors>
+                        <Anchor relativePoint="TOPLEFT" point="TOPRIGHT">
+                            <Offset x="232" y="-146"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontNormalLarge" name="Deadline_Tyrant" text="9" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset x="248" y="-146"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+<!--                 
                 <FontString inherits="GameFontNormalLarge" name="MaxImpsXCoresLabel" text="Max Imps X Cores:" >
                     <Color r="1" g="0.8" b="1" a="1"/>
                     <FontHeight val="12"/>
@@ -123,7 +182,7 @@
                             <Offset x="16" y="-128"/>
                         </Anchor>
                     </Anchors>
-                </FontString>
+                </FontString> -->
             </Layer>
 		</Layers>
 		<Frames>

@@ -15,23 +15,21 @@ local function G(rawVal)
     return string.format("%.1f", (rawVal / 10000)).."G"
 end
 
-print("Hello, world of warcraft!  Sincerely, DemonSnax")
+local className, classFilename, classID = C_PlayerInfo.GetClass(PlayerLocation:CreateFromUnit("player"))
+
+local DemonSnaxFrame = {}
 
 DemonSnaxData = {}
 DemonSnaxData.vfActive = false;
 DemonSnaxData.vfExpires = 0;
 DemonSnaxData.uiUpdateDelay = 1.0/60.0;
 DemonSnaxData.nextUpdate = 0;
-
-
-local DemonSnaxFrame = CreateFrame("FRAME", "DemonSnaxFrame")
+DemonSnaxData.tyrants = {};
 
 local function OnEvent(self, event)
     print(CombatLogGetCurrentEventInfo())
 end
 
-DemonSnaxFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-DemonSnaxFrame:SetScript("OnEvent", OnEvent)
 
 local function dcPrint(msg)
     --local t = DemonSnaxEditBox:GetText() or ""
@@ -49,59 +47,73 @@ local function LogEvent(self, event, ...)
 	end
 end
 
---TODO: REMOVE THIS BEFORE SHIPPING THE ADDON
--- If you are not me and you are reading this, I'm very sorry
--- that I accidentally shipped it
---
--- Sincerely,
---   A Fool
-local function OnEventTraceLoaded()
-	EventTrace.LogEvent_Original = EventTrace.LogEvent
-	EventTrace.LogEvent = LogEvent
-end
+-- --TODO: REMOVE THIS BEFORE SHIPPING THE ADDON
+-- -- If you are not me and you are reading this, I'm very sorry
+-- -- that I accidentally shipped it
+-- --
+-- -- Sincerely,
+-- --   A Fool
+-- local function OnEventTraceLoaded()
+-- 	EventTrace.LogEvent_Original = EventTrace.LogEvent
+-- 	EventTrace.LogEvent = LogEvent
+-- end
 
-if EventTrace then
-	OnEventTraceLoaded()
-else
-	local frame = CreateFrame("Frame")
-	frame:RegisterEvent("ADDON_LOADED")
-	frame:SetScript("OnEvent", function(self, event, ...)
-		if event == "ADDON_LOADED" and (...) == "Blizzard_EventTrace" then
-			OnEventTraceLoaded()
-			self:UnregisterAllEvents()
-		end
-	end)
-end
---------------------------------
+-- if EventTrace then
+-- 	OnEventTraceLoaded()
+-- else
+-- 	local frame = CreateFrame("Frame")
+-- 	frame:RegisterEvent("ADDON_LOADED")
+-- 	frame:SetScript("OnEvent", function(self, event, ...)
+-- 		if event == "ADDON_LOADED" and (...) == "Blizzard_EventTrace" then
+-- 			OnEventTraceLoaded()
+-- 			self:UnregisterAllEvents()
+-- 		end
+-- 	end)
+-- end
+-- --------------------------------
 
-coolKludge = {}
-coolKludge.total = 0
-DemonSnaxFrame:SetScript("OnEvent", function(self, event, ...)
+function eventHandlerWrapper(self, event, ...)
     if event == "COMBAT_LOG_EVENT_UNFILTERED" then  
         handleEvent(CombatLogGetCurrentEventInfo())
+    elseif event == "ADDON_LOADED" then
+        DemonSnax_Frame:Show()
     end
-end)
-
--- 1. Pick HELLOWORLD as the unique identifier.
--- 2. Pick /hiw and /hellow as slash commands (/hi and /hello are actual emotes)
-SLASH_DEMONSNAX1, SLASH_DEMONSNAX2 = '/ds', '/DemonSnax'; -- 3.
-function SlashCmdList.DEMONSNAX(msg, editbox) -- 4.
- print("Hello, World!");
- DemonSnax_Frame:Show()
- dcPrint("test");
 end
 
-function updateUI(timestamp)
-    if timestamp > DemonSnaxData.nextUpdate then
+
+if (classID == 9) then
+    DemonSnaxFrame = CreateFrame("FRAME", "DemonSnaxFrame")
+    DemonSnaxFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    --DemonSnaxFrame:SetScript("OnEvent", OnEvent)
+
+	DemonSnaxFrame:RegisterEvent("ADDON_LOADED")
+    DemonSnaxFrame:SetScript("OnEvent", eventHandlerWrapper)
+end
+
+
+SLASH_DEMONSNAX1, SLASH_DEMONSNAX2 = '/ds', '/DemonSnax';
+function SlashCmdList.DEMONSNAX(msg, editbox)
+    if (classID == 9) then
+        DemonSnax_Frame:Show()
+    else
+        print("Silly " .. className .. "!  DemonSnax are for Warlocks!")
+    end
+end
+
+function DemonSnax_updateUI(self, elapsed)
+    --if timestamp > DemonSnaxData.nextUpdate then
         local dbg = false
-        DemonSnaxData.nextUpdate = timestamp + DemonSnaxData.uiUpdateDelay
+        --DemonSnaxData.nextUpdate = timestamp + DemonSnaxData.uiUpdateDelay
         if (DemonSnaxData.vfExpires == 0) then
-            DemonSnaxData.vfExpires = timestamp + 15
+            DemonSnaxData.vfExpires = GetTime() + 15
             dbg = true
         end
 
-        if (timestamp > DemonSnaxData.vfExpires + 5) then
+        local vfTimeLeft = DemonSnaxData.vfExpires - GetTime()
+
+        if (vfTimeLeft < 0) then
             DemonSnaxData.vfExpires = 0
+            vfTimeLeft = 0
         end
 
         local handCastTime = 0
@@ -113,46 +125,27 @@ function updateUI(timestamp)
         local demonBoltTime = handCastTime
         local dogTime = demonBoltTime
 
-        VilefiendTime:SetText(string.format("%.1f seconds", DemonSnaxData.vfExpires - timestamp))
+        local spell, _, _, _, endTimeMs = UnitCastingInfo("player")
+        local timeAfterCur = vfTimeLeft
+        if (endTimeMs ~= nil) then
+            local endTime = endTimeMs / 1000
+            timeAfterCur = DemonSnaxData.vfExpires - endTime
+        end
+        --TODO: GCD
+
+        TimeLeftAfterCurCast:SetText(string.format("%.1f seconds", timeAfterCur))
+
+        VilefiendTime:SetText(string.format("%.1f seconds", vfTimeLeft))
         SBTime:SetText(string.format("%.1f seconds", tyrantCastTime))
         HandTime:SetText(string.format("%.1f seconds", handCastTime))
 
-        if dbg then
-            local bigHands = 2
-            local setupTime = 15 --15 seconds after you cast Vilefiend to get out 1x bolt,
-                -- 1x dogs, 1x hand w/ 3 shards, 1x bolt, 1x hand with 3 shards, (filler)
-                -- then Summon Demonic Tyrant (+200ms leeway)
-            local fillerTime = setupTime - tyrantCastTime - dogTime - 2*shadowBoltTime - 2*handCastTime - 0.2
-            local bigHandTime = 3 * shadowBoltTime + handCastTime
-            bigHands = bigHands + math.floor(fillerTime/bigHandTime)
-            local remaining = fillerTime % bigHandTime
-            remaining = remaining - shadowBoltTime - handCastTime
-            local smallHand = 0
-            if (remaining > 0) then
-                local extraBolts = math.floor(remaining/shadowBoltTime)
-                smallHand = 1 + extraBolts
-            end
-            print("filler:", fillerTime, " bht:", bigHandTime, " rem:", remaining, ", bHs:", bigHands)
-
-            local imps = bigHands*3 + smallHand
-            local hands = bigHands
-            if (smallHand > 0) then
-                hands = hands + 1
-            end
-    
-            local bolts = imps
-            if smallHand == 0 and remaining > shadowBoltTime then
-                bolts = bolts + 1
-            end
-    
-            MaxImpsNoCores:SetText(string.format("%d", imps))
-            XBoltsYHands200:SetText(string.format("Time for %d bolts and %d hands (200ms margin)", bolts, hands))
-    
-            --doh, looks like you need to do 2x shadowbolt after the vilefiend, and if you get demonic calling you need to add
-            -- a filler spell after that if you want your dogs to get hit with the tyrant when he comes out
-            -- 
-        end
-    end
+        local deadline = 0.2 + tyrantCastTime
+        Deadline_Tyrant:SetText(string.format("%.1f seconds", deadline))
+        deadline = deadline + handCastTime
+        Deadline_LastHand:SetText(string.format("%.1f seconds", deadline))
+        deadline = deadline + shadowBoltTime
+        Deadline_LastSBolt:SetText(string.format("%.1f seconds", deadline))
+    --end
 end
 
 function handleEvent(...)
@@ -174,7 +167,9 @@ function handleEvent(...)
         spellId, spellName, spellSchool = select(12, ...)
         if spellId == 265187 then
             print("Demonic Tyrant summoned!")
-            coolKludge.total = 0
+            DemonSnaxData.tyrants[#DemonSnaxData.tyrants+1] = {}
+            DemonSnaxData.tyrants[#DemonSnaxData.tyrants].timestamp = timestamp
+            DemonSnaxData.tyrants[#DemonSnaxData.tyrants].total = 0
         end
     end
 
@@ -182,18 +177,20 @@ function handleEvent(...)
     --print(cooldump(args))
     --print(subevent , ":" , sourceGUID , ", ==playerGUID? "  , (sourceGUID == playerGUID), spellId, spellName, amount, destName)
     if sourceGUID == playerGUID then
-        dcPrint(cooldump({...}))
+        --dcPrint(cooldump({...}))
         if spellId == 267971 then
             print(cooldump({...}))
-            coolKludge.total = coolKludge.total + amount
-            print("DemonSnax dealt ", coolKludge.total, " damage")
+            local cur = #DemonSnaxData.tyrants
+            print("cur: ", cur, ", amount:", amount)
+            print("DemonSnax dealt ", DemonSnaxData.tyrants[cur].total, " damage")
+            DemonSnaxData.tyrants[cur].total = DemonSnaxData.tyrants[cur].total + amount
         -- get the link of the spell or the MELEE globalstring
         --local action = spellId and GetSpellLink(spellId) or MELEE
         --print(MSG_CRITICAL_HIT:format(action, destName, amount))
         end
     end
 
-    updateUI(timestamp)
+    --updateUI(timestamp)
 end
 
 
