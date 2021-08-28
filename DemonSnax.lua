@@ -143,17 +143,23 @@ function DemonSnax_updateUI(self, elapsed)
 
         local deadline = 0.2 + tyrantCastTime
         local tyrantDeadline = deadline
-        Deadline_Tyrant:SetText(string.format("%.1f seconds", tyrantDeadline))
         deadline = deadline + handCastTime
         local handDeadline = deadline
-        Deadline_LastHand:SetText(string.format("%.1f seconds", deadline))
         deadline = deadline + shadowBoltTime
         Deadline_LastSBolt:SetText(string.format("%.1f seconds", deadline))
         
         if (tyrantDeadline < timeAfterCur and handDeadline > timeAfterCur) then
             TimeLeftAfterCurCast:SetText(string.format("** %.1f seconds **", timeAfterCur))
+            Deadline_Tyrant:SetText(string.format("--> %.1f seconds <--", tyrantDeadline))
+            Deadline_LastHand:SetText(string.format("%.1f seconds", deadline))
+        elseif (handDeadline + demonBoltTime > timeAfterCur and handDeadline < timeAfterCur) then
+            TimeLeftAfterCurCast:SetText(string.format("%.1f seconds", timeAfterCur))
+            Deadline_Tyrant:SetText(string.format("%.1f seconds", tyrantDeadline))
+            Deadline_LastHand:SetText(string.format("--> %.1f seconds", handDeadline))
         else
             TimeLeftAfterCurCast:SetText(string.format("%.1f seconds", timeAfterCur))
+            Deadline_Tyrant:SetText(string.format("%.1f seconds", tyrantDeadline))
+            Deadline_LastHand:SetText(string.format("%.1f seconds", handDeadline))
         end
     --end
 end
