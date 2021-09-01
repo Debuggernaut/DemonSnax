@@ -100,7 +100,7 @@
                         </Anchor>
                     </Anchors>
                 </FontString>
-                <FontString inherits="GameFontNormalLarge" text="Last Shadowbolt:" >
+                <FontString inherits="GameFontNormalLarge" text="GCDs before Tyrant:" >
                     <Color r="1" g="0.8" b="1" a="1"/>
                     <FontHeight val="12"/>
                     <Anchors>
@@ -109,7 +109,7 @@
                         </Anchor>
                     </Anchors>
                 </FontString>
-                <FontString inherits="GameFontNormalLarge" name="Deadline_LastSBolt" text="9" >
+                <FontString inherits="GameFontNormalLarge" name="Deadline_GCDs" text="9" >
                     <Anchors>
                         <Anchor point="TOPLEFT">
                             <Offset x="248" y="-114"/>

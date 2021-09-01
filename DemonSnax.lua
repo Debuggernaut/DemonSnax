@@ -47,31 +47,6 @@ local function LogEvent(self, event, ...)
 	end
 end
 
--- --TODO: REMOVE THIS BEFORE SHIPPING THE ADDON
--- -- If you are not me and you are reading this, I'm very sorry
--- -- that I accidentally shipped it
--- --
--- -- Sincerely,
--- --   A Fool
--- local function OnEventTraceLoaded()
--- 	EventTrace.LogEvent_Original = EventTrace.LogEvent
--- 	EventTrace.LogEvent = LogEvent
--- end
-
--- if EventTrace then
--- 	OnEventTraceLoaded()
--- else
--- 	local frame = CreateFrame("Frame")
--- 	frame:RegisterEvent("ADDON_LOADED")
--- 	frame:SetScript("OnEvent", function(self, event, ...)
--- 		if event == "ADDON_LOADED" and (...) == "Blizzard_EventTrace" then
--- 			OnEventTraceLoaded()
--- 			self:UnregisterAllEvents()
--- 		end
--- 	end)
--- end
--- --------------------------------
-
 function eventHandlerWrapper(self, event, ...)
     if event == "COMBAT_LOG_EVENT_UNFILTERED" then  
         handleEvent(CombatLogGetCurrentEventInfo())
@@ -98,6 +73,11 @@ function SlashCmdList.DEMONSNAX(msg, editbox)
     else
         print("Silly " .. className .. "!  DemonSnax are for Warlocks!")
     end
+	print("Handy DemonSnax commands:")
+	print("Dump info DemonSnax has recorded this run:")
+	print("/dump DemonSnaxData")
+	print("Test the countdown code in case you're using TellMeWhen alerts:")
+	print("/run DemonSnaxData.vfExpires = GetTime()+15")
 end
 
 --To use these functions with TellMeWhen, copy in this line of code without the "--" at the front
@@ -187,6 +167,10 @@ function DemonSnax_updateUI(self, elapsed)
         local handCastTime = 0
         local name, rank, icon, tyrantCastTime, minRange, maxRange = GetSpellInfo("Summon Demonic Tyrant")
         name, rank, icon, handCastTime, minRange, maxRange = GetSpellInfo("Hand of Gul'dan")
+		if (tyrantCastTime == nil) then
+			DemonSnax_Frame:Hide()
+			return
+		end
         tyrantCastTime = tyrantCastTime / 1000.0
         handCastTime = handCastTime / 1000.0
         local shadowBoltTime = tyrantCastTime
@@ -194,13 +178,13 @@ function DemonSnax_updateUI(self, elapsed)
         local dogTime = demonBoltTime
 
         local spell, _, _, _, endTimeMs = UnitCastingInfo("player")
-        local gcdStart, duration, _, _ = GetSpellCooldown(61304)
+        local gcdStart, gcdDuration, _, _ = GetSpellCooldown(61304)
         local timeAfterCur = vfTimeLeft
         if (endTimeMs ~= nil and vfTimeLeft ~= 0) then
             local endTime = endTimeMs / 1000
             timeAfterCur = DemonSnaxData.vfExpires - endTime
         elseif (gcdStart ~= 0 and vfTimeLeft ~= 0) then
-            local endTime = gcdStart + duration
+            local endTime = gcdStart + gcdDuration
             timeAfterCur = DemonSnaxData.vfExpires - endTime
         end
         --TODO: GCD
@@ -214,7 +198,10 @@ function DemonSnax_updateUI(self, elapsed)
         deadline = deadline + handCastTime
         local handDeadline = deadline
         deadline = deadline + shadowBoltTime
-        Deadline_LastSBolt:SetText(string.format("%.1f seconds", deadline))
+        --Deadline_LastSBolt:SetText(string.format("%.1f seconds", deadline))
+		
+		local GCDsLeft = math.floor((timeAfterCur - tyrantDeadline)/demonBoltTime)
+		Deadline_GCDs:SetText(string.format("%d",GCDsLeft ))
         
         if (tyrantDeadline < timeAfterCur and handDeadline > timeAfterCur) then
             TimeLeftAfterCurCast:SetText(string.format("** %.1f seconds **", timeAfterCur))
@@ -261,7 +248,7 @@ function handleEvent(...)
             DemonSnaxData.vfActive = true
             DemonSnaxData.vfExpires = GetTime() + 15
         end
-        print("Summon!", spellName, spellId)
+        --print("Summon!", spellName, spellId)
         --    DemonSnaxData.tyrants[#DemonSnaxData.tyrants+1] = {}
         --    DemonSnaxData.tyrants[#DemonSnaxData.tyrants].timestamp = timestamp
         --    DemonSnaxData.tyrants[#DemonSnaxData.tyrants].total = 0
