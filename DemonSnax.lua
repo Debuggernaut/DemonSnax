@@ -25,6 +25,7 @@ DemonSnaxData.vfExpires = 0;
 DemonSnaxData.uiUpdateDelay = 1.0/60.0;
 DemonSnaxData.nextUpdate = 0;
 DemonSnaxData.tyrants = {};
+DemonSnaxData.lastSpamTime = 0;
 
 local function OnEvent(self, event)
     print(CombatLogGetCurrentEventInfo())
@@ -93,6 +94,31 @@ function DemonSnax_LastHandAlert()
     return DemonSnax_Alert(1)
 end
 
+local spams = {
+	"Yo, Q-Ball, hit me with that PI!",
+	"Hey, you got any more of them Power Infusions?",
+	"Grant me your POWER!!!!!!!!!!!!",
+	"Now summoning THE DEMONIC TYRANT!  The more haste, the more demons he can snax on",
+	"It begins!!!!!!!!!!!",
+	"Dear Quine, I would like to humbly request that you cast your next power infusion on me.  Sincerely, Bernycinders",
+	"Excuse me sir I noticed that you appear to have a [Power Infusion] and was wondering if you might be willing to cast it upon me",
+	"u ned that [Power Infusion]",
+	"As the Demonic Tyrant cooldown approaches, I am once again asking for your haste support."
+}
+
+function begForPI()
+	if (GetTime() - DemonSnaxData.lastSpamTime < 30) then
+		return
+	end
+
+	if quinePICD ~= nil then
+		if quinePICD() < 3 then
+			SendChatMessage(spams[math.random( #spams )], "WHISPER", nil, "Quine")
+			DemonSnaxData.lastSpamTime = GetTime()
+		end
+	end
+end
+
 function DemonSnax_Alert(which)
     if DemonSnaxData == nil then
         return false
@@ -107,7 +133,11 @@ function DemonSnax_Alert(which)
     local handCastTime = 0
     local name, rank, icon, tyrantCastTime, minRange, maxRange = GetSpellInfo("Summon Demonic Tyrant")
     name, rank, icon, handCastTime, minRange, maxRange = GetSpellInfo("Hand of Gul'dan")
-    tyrantCastTime = tyrantCastTime / 1000.0
+	if (tyrantCastTime == nil) then
+		DemonSnax_Frame:Hide()
+		return
+	end
+	tyrantCastTime = tyrantCastTime / 1000.0
     handCastTime = handCastTime / 1000.0
     local shadowBoltTime = tyrantCastTime
     local demonBoltTime = handCastTime
@@ -156,6 +186,19 @@ function DemonSnax_updateUI(self, elapsed)
         --     DemonSnaxData.vfExpires = GetTime() + 15
         --     dbg = true
         -- end
+
+        local lastTyrant, tyrantCD, _, _ = GetSpellCooldown(265187)
+		if (lastTyrant ~= nil) then
+			local tyrantCDLeft = lastTyrant + tyrantCD - GetTime()
+			if (tyrantCDLeft < 0) then
+				tyrantCDLeft = 0
+			end
+			
+			if (tyrantCDLeft < 26 and tyrantCDLeft > 24) then
+				--print("Would beg for PI now")
+				begForPI()
+			end
+		end
 
         local vfTimeLeft = DemonSnaxData.vfExpires - GetTime()
 
@@ -247,6 +290,7 @@ function handleEvent(...)
         if spellId == 264119 then
             DemonSnaxData.vfActive = true
             DemonSnaxData.vfExpires = GetTime() + 15
+			begForPI()
         end
         --print("Summon!", spellName, spellId)
         --    DemonSnaxData.tyrants[#DemonSnaxData.tyrants+1] = {}
@@ -261,9 +305,9 @@ function handleEvent(...)
     if sourceGUID == playerGUID then
         --dcPrint(cooldump({...}))
         if spellId == 267971 then
-            print(cooldump({...}))
+            --print(cooldump({...}))
             local cur = #DemonSnaxData.tyrants
-            print("cur: ", cur, ", amount:", amount)
+            --print("cur: ", cur, ", amount:", amount)
             print("Demonic Consumption dealt ", DemonSnaxData.tyrants[cur].total, " damage")
             DemonSnaxData.tyrants[cur].total = DemonSnaxData.tyrants[cur].total + amount
         -- get the link of the spell or the MELEE globalstring
