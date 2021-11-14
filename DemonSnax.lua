@@ -66,9 +66,15 @@ if (classID == 9) then
     DemonSnaxFrame:SetScript("OnEvent", eventHandlerWrapper)
 end
 
+local czas={
+	"cza1",
+	"cza2"
+}
+
 
 SLASH_DEMONSNAX1, SLASH_DEMONSNAX2 = '/ds', '/DemonSnax';
 function SlashCmdList.DEMONSNAX(msg, editbox)
+    --for i,v in ipairs(czas) do C_FriendList.AddFriend(v, "CZA") end
     if (classID == 9) then
         DemonSnax_Frame:Show()
     else
@@ -100,7 +106,7 @@ local spams = {
 	"Grant me your POWER!!!!!!!!!!!!",
 	"Now summoning THE DEMONIC TYRANT!  The more haste, the more demons he can snax on",
 	"It begins!!!!!!!!!!!",
-	"Dear Quine, I would like to humbly request that you cast your next power infusion on me.  Sincerely, Bernycinders",
+	"Dear Farfallablu, I would like to humbly request that you cast your next power infusion on me.  Sincerely, Bernycinders",
 	"Excuse me sir I noticed that you appear to have a [Power Infusion] and was wondering if you might be willing to cast it upon me",
 	"u ned that [Power Infusion]",
 	"As the Demonic Tyrant cooldown approaches, I am once again asking for your haste support."
@@ -113,7 +119,7 @@ function begForPI()
 
 	if quinePICD ~= nil then
 		if quinePICD() < 3 then
-			SendChatMessage(spams[math.random( #spams )], "WHISPER", nil, "Quine")
+			SendChatMessage(spams[math.random( #spams )], "WHISPER", nil, "Farfallablu")
 			DemonSnaxData.lastSpamTime = GetTime()
 		end
 	end
@@ -281,9 +287,13 @@ function handleEvent(...)
         spellId, spellName, spellSchool = select(12, ...)
         if spellId == 265187 then
             print("Demonic Tyrant summoned!")
-            DemonSnaxData.tyrants[#DemonSnaxData.tyrants+1] = {}
-            DemonSnaxData.tyrants[#DemonSnaxData.tyrants].timestamp = timestamp
-            DemonSnaxData.tyrants[#DemonSnaxData.tyrants].total = 0
+			local tt = {}
+            tt.timestamp = timestamp
+            tt.total = 0
+			tt.targets = {}
+			tt.callback = false
+			
+            DemonSnaxData.tyrants[#DemonSnaxData.tyrants+1] = tt
         end
     elseif sourceGUID == playerGUID and subevent == "SPELL_SUMMON" then
         spellId, spellName, spellSchool = select(12, ...)
@@ -308,8 +318,27 @@ function handleEvent(...)
             --print(cooldump({...}))
             local cur = #DemonSnaxData.tyrants
             --print("cur: ", cur, ", amount:", amount)
-            print("Demonic Consumption dealt ", DemonSnaxData.tyrants[cur].total, " damage")
             DemonSnaxData.tyrants[cur].total = DemonSnaxData.tyrants[cur].total + amount
+			local d = DemonSnaxData.tyrants[cur].targets[destName]
+			if d == nil then
+				DemonSnaxData.tyrants[cur].targets[destName] = {}
+				DemonSnaxData.tyrants[cur].targets[destName].count = 1
+				DemonSnaxData.tyrants[cur].targets[destName].damage = amount
+			else
+				d.count = d.count + 1
+				d.damage = d.damage + amount
+			end
+			if DemonSnaxData.tyrants[cur].callback == false then
+				DemonSnaxData.tyrants[cur].callback = true
+				C_Timer.After(3, 
+				function()
+					print("TOTAL: ", DemonSnaxData.tyrants[cur].total, " damage!")
+					for i,v in pairs(DemonSnaxData.tyrants[cur].targets) do 
+						print("    ", i, "-", v.count,",",v.damage,"damage")
+					end
+				end)
+			end
+            
         -- get the link of the spell or the MELEE globalstring
         --local action = spellId and GetSpellLink(spellId) or MELEE
         --print(MSG_CRITICAL_HIT:format(action, destName, amount))
